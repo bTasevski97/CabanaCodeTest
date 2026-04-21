@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { ResortMap } from "./ResortMap";
 import type { Cabana } from "../hooks/useCabanas";
@@ -67,5 +68,24 @@ describe("ResortMap", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent(/unable to load the resort map/i);
     expect(screen.getByText("Failed to load cabanas")).toBeInTheDocument();
+  });
+
+  it("displays a tooltip when hovering over a cabana", async () => {
+    const user = userEvent.setup();
+    const cabanas: Cabana[] = [{ id: "W-0-0", row: 0, col: 0, status: "available" }];
+
+    render(
+      <ResortMap
+        cabanas={cabanas}
+        cabanasLoading={false}
+        cabanasError={null}
+        onCabanaSelect={() => {}}
+      />
+    );
+
+    const cabanaTile = screen.getByRole("button", { name: /cabana W-0-0/i });
+    await user.hover(cabanaTile);
+
+    expect(screen.getByText(/cabana W-0-0 • Available/i)).toBeInTheDocument();
   });
 });
