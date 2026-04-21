@@ -9,6 +9,9 @@ The project includes enhanced cross-platform entry scripts that handle **validat
 - **Windows:** `.\run.ps1`
 - **Unix/Linux/macOS:** `./run.sh`
 
+> [!NOTE]
+> Please note that these scripts have **not** been tested on macOS.
+
 ### Smart CLI Features:
 - **Fast Parameter Validation:** The scripts validate your arguments (filenames, formatting) *before* starting the build.
 - **Interactive Map Selection:** If you run the script without a `--map` argument:
@@ -47,7 +50,7 @@ dotnet run --project src/ResortMap/ResortMap.csproj
 
 ### Backend Tests
 ```bash
-dotnet test
+dotnet test tests/ResortMap.Tests/ResortMap.Tests.csproj
 ```
 *Validated map parsing logic, path resolution algorithms, and guest validation logic.*
 
