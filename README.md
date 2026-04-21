@@ -28,7 +28,7 @@ The project includes enhanced cross-platform entry scripts that handle **validat
 
 | Layer | Choice | Rationale |
 | :--- | :--- | :--- |
-| **Backend** | .NET 10 (Minimal API) | High-performance |
+| **Backend** | .NET 10 (Minimal API) | High-performance, cross-platform runtime. Minimal APIs and low-boilerplate |
 | **Frontend** | React 19 + Vite + React Compiler | Most popular framework, with Vite which is currently the web standard. React Compiler is used to automatically optimize renders without manual memoization. |
 | **Styling** | Tailwind CSS v4 | Fast, easy to manage zero runtime CSS. |
 | **Testing** | xUnit & Vitest | Modern testing frameworks for both ecosystems that are fast and developer-friendly. |
