@@ -52,6 +52,7 @@ export function MapTile({ tile }: MapTileProps) {
     >
       <img
         src={assetUrl}
+        alt={alt}
         className="pointer-events-none block size-full object-contain"
         style={rotation ? { transform: `rotate(${rotation}deg)` } : undefined}
         draggable={false}
