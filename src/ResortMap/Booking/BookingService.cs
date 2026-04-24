@@ -6,7 +6,7 @@ namespace ResortMap.Booking;
 
 public interface IBookingService
 {
-    IEnumerable<Cabana> GetAllCabanas();
+    IEnumerable<CabanaDto> GetAllCabanas();
     IResult BookCabana(string id, BookingRequest request);
 }
 
@@ -34,7 +34,8 @@ public class BookingService : IBookingService
         }
     }
 
-    public IEnumerable<Cabana> GetAllCabanas() => _cabanas.Values;
+    public IEnumerable<CabanaDto> GetAllCabanas() => 
+        _cabanas.Values.Select(c => new CabanaDto(c.Id, c.Row, c.Col, c.Status));
 
     public IResult BookCabana(string id, BookingRequest request)
     {

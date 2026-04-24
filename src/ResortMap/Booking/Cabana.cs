@@ -16,3 +16,5 @@ public class Cabana
 public record BookingRequest(string Room, string GuestName);
 
 public record BookingResponse(bool Success, string Message);
+
+public record CabanaDto(string Id, int Row, int Col, CabanaStatus Status);

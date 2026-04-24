@@ -7,7 +7,6 @@ export interface Cabana {
   row: number;
   col: number;
   status: CabanaStatus;
-  bookedBy?: { room: string; guestName: string };
 }
 
 export interface BookingRequest {

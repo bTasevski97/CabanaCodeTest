@@ -42,7 +42,10 @@ builder.Services.AddCors();
 
 var app = builder.Build();
 
-app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors(policy => 
+    policy.WithOrigins("http://localhost:5173")
+          .AllowAnyMethod()
+          .AllowAnyHeader());
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
