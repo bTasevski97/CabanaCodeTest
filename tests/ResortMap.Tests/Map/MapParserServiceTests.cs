@@ -91,16 +91,92 @@ public class MapParserServiceTests
     }
 
     [Fact]
-    public void PathTiles_GetVariantAndRotationResolved()
+    public void PathTile_FourConnections_ResolvesAsCrossing()
     {
-        // Vertical straight path
-        string[] lines = ["#", "#", "#"];
+        var result = Map.Parse([".#.", "###", ".#."]);
 
-        var result = Map.Parse(lines);
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Crossing, center.PathVariant);
+        Assert.Equal(0, center.Rotation);
+    }
 
-        var middlePath = result.Tiles.Single(t => t.Row == 1);
-        Assert.Equal(PathVariant.Straight, middlePath.PathVariant);
-        Assert.Equal(0, middlePath.Rotation);
+    [Fact]
+    public void PathTile_VerticalStraight_ResolvesWithZeroRotation()
+    {
+        var result = Map.Parse(["#", "#", "#"]);
+
+        var middle = result.Tiles.Single(t => t.Row == 1);
+        Assert.Equal(PathVariant.Straight, middle.PathVariant);
+        Assert.Equal(0, middle.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_HorizontalStraight_ResolvesWith90Rotation()
+    {
+        var result = Map.Parse(["...", "###", "..."]);
+
+        var middle = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Straight, middle.PathVariant);
+        Assert.Equal(90, middle.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_TopRightCorner_ResolvesWithZeroRotation()
+    {
+        var result = Map.Parse([".#.", ".##", "..."]);
+
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Corner, center.PathVariant);
+        Assert.Equal(0, center.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_BottomLeftCorner_ResolvesWith180Rotation()
+    {
+        var result = Map.Parse(["...", "##.", ".#."]);
+
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Corner, center.PathVariant);
+        Assert.Equal(180, center.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_TSplitMissingLeft_ResolvesWithZeroRotation()
+    {
+        var result = Map.Parse([".#.", ".##", ".#."]);
+
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Split, center.PathVariant);
+        Assert.Equal(0, center.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_DeadEndBottom_ResolvesWithZeroRotation()
+    {
+        var result = Map.Parse(["...", ".#.", ".#."]);
+
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.End, center.PathVariant);
+        Assert.Equal(0, center.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_Isolated_DefaultsToStraight()
+    {
+        var result = Map.Parse(["...", ".#.", "..."]);
+
+        var center = result.Tiles.Single(t => t.Row == 1 && t.Col == 1);
+        Assert.Equal(PathVariant.Straight, center.PathVariant);
+        Assert.Equal(0, center.Rotation);
+    }
+
+    [Fact]
+    public void PathTile_AtMapEdge_HandlesOutOfBoundsGracefully()
+    {
+        var result = Map.Parse(["##", "##"]);
+
+        var topLeft = result.Tiles.Single(t => t.Row == 0 && t.Col == 0);
+        Assert.Equal(PathVariant.Corner, topLeft.PathVariant);
     }
 
     [Fact]
