@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ResortMap.Tests.Maps;
 
-public class MapParserServiceTests
+public class MapTests
 {
     [Fact]
     public void EmptyInput_ReturnsEmptyMap()

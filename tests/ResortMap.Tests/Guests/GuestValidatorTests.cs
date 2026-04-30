@@ -4,13 +4,24 @@ using Xunit;
 
 namespace ResortMap.Tests.Guests;
 
-public class GuestValidatorTests
+public class GuestValidatorTests : IDisposable
 {
+    private readonly List<string> _tempFiles = [];
+
     private GuestValidator CreateValidatorWithGuests(params Guest[] guests)
     {
         var tempFile = Path.GetTempFileName();
+        _tempFiles.Add(tempFile);
         File.WriteAllText(tempFile, JsonSerializer.Serialize(guests));
         return new GuestValidator(tempFile);
+    }
+
+    public void Dispose()
+    {
+        foreach (var file in _tempFiles)
+        {
+            if (File.Exists(file)) File.Delete(file);
+        }
     }
 
     [Fact]

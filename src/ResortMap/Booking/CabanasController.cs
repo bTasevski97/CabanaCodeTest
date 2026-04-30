@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ResortMap.Booking;
 
 namespace ResortMap.Booking;
 
