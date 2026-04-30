@@ -25,6 +25,6 @@ public class CabanasController(IBookingService bookingService) : ControllerBase
             };
         }
 
-        return Ok(new BookingResponse(true, result.Message));
+        return Created($"/api/cabanas/{id}/bookings", new BookingResponse(true, result.Message));
     }
 }
