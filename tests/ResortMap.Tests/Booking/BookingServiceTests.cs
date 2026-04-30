@@ -4,16 +4,14 @@ using ResortMap.Guests;
 using ResortMap.Maps;
 using Xunit;
 
-using MapModel = ResortMap.Maps.Map;
-
 namespace ResortMap.Tests.Booking;
 
 public class BookingServiceTests
 {
-    private static MapModel CreateMapWithCabanas(params (int row, int col)[] positions)
+    private static Map CreateMapWithCabanas(params (int row, int col)[] positions)
     {
         if (positions.Length == 0)
-            return MapModel.Parse(["."]);
+            return Map.Parse(["."]);
 
         int rows = positions.Max(p => p.row) + 1;
         int cols = positions.Max(p => p.col) + 1;
@@ -28,10 +26,10 @@ public class BookingServiceTests
             lines[r] = new string(chars);
         }
 
-        return MapModel.Parse(lines);
+        return Map.Parse(lines);
     }
 
-    private static BookingService CreateService(MapModel map, IGuestValidator? validator = null)
+    private static BookingService CreateService(Map map, IGuestValidator? validator = null)
     {
         validator ??= Substitute.For<IGuestValidator>();
         validator.IsValid(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
@@ -55,7 +53,7 @@ public class BookingServiceTests
     public void GetAllCabanas_ExcludesNonCabanaTiles()
     {
         // '#' = Path, 'W' = Cabana, 'p' = Pool
-        var map = MapModel.Parse(["#Wp"]);
+        var map = Map.Parse(["#Wp"]);
         var service = CreateService(map);
 
         var cabanas = service.GetAllCabanas().ToList();

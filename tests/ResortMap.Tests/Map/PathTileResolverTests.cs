@@ -1,7 +1,7 @@
 using ResortMap.Maps;
 using Xunit;
 
-namespace ResortMap.Tests.Map;
+namespace ResortMap.Tests.Maps;
 
 public class PathTileResolverTests
 {

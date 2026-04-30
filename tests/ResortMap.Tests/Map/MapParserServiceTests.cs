@@ -1,16 +1,14 @@
 using ResortMap.Maps;
 using Xunit;
 
-using MapModel = ResortMap.Maps.Map;
-
-namespace ResortMap.Tests.Map;
+namespace ResortMap.Tests.Maps;
 
 public class MapParserServiceTests
 {
     [Fact]
     public void EmptyInput_ReturnsEmptyMap()
     {
-        var result = MapModel.Parse([]);
+        var result = Map.Parse([]);
 
         Assert.Equal(0, result.Rows);
         Assert.Equal(0, result.Cols);
@@ -26,7 +24,7 @@ public class MapParserServiceTests
     [InlineData('?', TileType.Empty)]
     public void SingleCharacter_MapsToCorrectTileType(char character, TileType expectedType)
     {
-        var result = MapModel.Parse([character.ToString()]);
+        var result = Map.Parse([character.ToString()]);
 
         var tile = Assert.Single(result.Tiles);
         Assert.Equal(expectedType, tile.Type);
@@ -35,7 +33,7 @@ public class MapParserServiceTests
     [Fact]
     public void CabanaTile_GetsGeneratedId()
     {
-        var result = MapModel.Parse(["W"]);
+        var result = Map.Parse(["W"]);
 
         var tile = Assert.Single(result.Tiles);
         Assert.Equal("W-0-0", tile.CabanaId);
@@ -44,7 +42,7 @@ public class MapParserServiceTests
     [Fact]
     public void NonCabanaTiles_HaveNullCabanaId()
     {
-        var result = MapModel.Parse(["c#p."]);
+        var result = Map.Parse(["c#p."]);
 
         Assert.All(result.Tiles, tile => Assert.Null(tile.CabanaId));
     }
@@ -54,7 +52,7 @@ public class MapParserServiceTests
     {
         string[] lines = [".c#", "W.p", "..."];
 
-        var result = MapModel.Parse(lines);
+        var result = Map.Parse(lines);
 
         Assert.Equal(3, result.Rows);
         Assert.Equal(3, result.Cols);
@@ -66,7 +64,7 @@ public class MapParserServiceTests
     {
         string[] lines = [".W", "c."];
 
-        var result = MapModel.Parse(lines);
+        var result = Map.Parse(lines);
 
         var cabana = result.Tiles.Single(t => t.Type == TileType.Cabana);
         Assert.Equal(0, cabana.Row);
@@ -83,7 +81,7 @@ public class MapParserServiceTests
     {
         string[] lines = ["...", "."];
 
-        var result = MapModel.Parse(lines);
+        var result = Map.Parse(lines);
 
         Assert.Equal(3, result.Cols);
         Assert.Equal(6, result.Tiles.Count());
@@ -98,7 +96,7 @@ public class MapParserServiceTests
         // Vertical straight path
         string[] lines = ["#", "#", "#"];
 
-        var result = MapModel.Parse(lines);
+        var result = Map.Parse(lines);
 
         var middlePath = result.Tiles.Single(t => t.Row == 1);
         Assert.Equal(PathVariant.Straight, middlePath.PathVariant);
@@ -110,7 +108,7 @@ public class MapParserServiceTests
     {
         string[] lines = ["WW", "WW"];
 
-        var result = MapModel.Parse(lines);
+        var result = Map.Parse(lines);
 
         var cabanaIds = result.Tiles
             .Where(t => t.Type == TileType.Cabana)
