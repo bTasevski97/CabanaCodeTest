@@ -1,6 +1,6 @@
 using ResortMap.Booking;
 using ResortMap.Guests;
-using ResortMap.Map;
+using ResortMap.Maps;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,32 +10,23 @@ var config = new ConfigurationBuilder().AddCommandLine(args).Build();
 string mapPath = config["map"] ?? "map.ascii";
 string bookingsPath = config["bookings"] ?? "bookings.json";
 
-if (!File.Exists(mapPath))
+try
 {
-    Console.Error.WriteLine($"Error: map file '{mapPath}' not found.");
+    var map = Map.Parse(File.ReadAllLines(mapPath));
+    builder.Services.AddSingleton(map);
+
+    var guestValidator = new GuestValidator(bookingsPath);
+    builder.Services.AddSingleton<IGuestValidator>(guestValidator);
+}
+catch (Exception ex)
+{
+    Console.Error.WriteLine($"Critical Startup Failure: {ex.Message}");
     Environment.Exit(1);
 }
 
-
-builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
-
-builder.Services.AddSingleton<MapResponse>(_ =>
-    new MapParserService().ParseMap(File.ReadAllLines(mapPath)));
-
-builder.Services.AddSingleton<IGuestValidator>(_ =>
-{
-    var validator = new GuestValidator();
-    if (File.Exists(bookingsPath))
-    {
-        validator.Load(bookingsPath);
-    }
-    else
-    {
-        Console.WriteLine($"Warning: bookings file '{bookingsPath}' not found. Guest validation will fail.");
-    }
-    return validator;
-});
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 
 builder.Services.AddSingleton<IBookingService, BookingService>();
 builder.Services.AddCors();
@@ -50,11 +41,8 @@ app.UseCors(policy =>
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.MapGet("/api/map", (MapResponse map) => Results.Ok(map));
-app.MapGet("/api/cabanas", (IBookingService bookingSvc) => Results.Ok(bookingSvc.GetAllCabanas()));
-app.MapPost("/api/cabanas/{id}/book", (string id, BookingRequest req, IBookingService bookingSvc) =>
-    bookingSvc.BookCabana(id, req));
-
+app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+

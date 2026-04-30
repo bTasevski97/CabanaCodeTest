@@ -28,7 +28,7 @@ The project includes enhanced cross-platform entry scripts that handle **validat
 
 | Layer | Choice | Rationale |
 | :--- | :--- | :--- |
-| **Backend** | .NET 10 (Minimal API) | High-performance, cross-platform runtime. Minimal APIs and low-boilerplate |
+| **Backend** | .NET 10 (MVC Controllers) | High-performance, cross-platform runtime. Controller-based API with clean separation between HTTP and domain logic. |
 | **Frontend** | React 19 + Vite + React Compiler | Most popular framework, with Vite which is currently the web standard. React Compiler is used to automatically optimize renders without manual memoization. |
 | **Styling** | Tailwind CSS v4 | Fast, easy to manage zero runtime CSS. |
 | **Testing** | xUnit & Vitest | Modern testing frameworks for both ecosystems that are fast and developer-friendly. |
@@ -52,7 +52,7 @@ dotnet run --project src/ResortMap/ResortMap.csproj
 ```bash
 dotnet test tests/ResortMap.Tests/ResortMap.Tests.csproj
 ```
-*Validated map parsing logic, path resolution algorithms, and guest validation logic.*
+*Validates map parsing logic, path resolution algorithms, booking service operations, and guest validation logic.*
 
 ### Frontend Tests
 ```bash
@@ -66,7 +66,7 @@ npm run test
 ## ✨ Design Rationale & Features
 
 ### 1. Simplicity & Minimal Libraries
-The app focuses on using the built-in capabilities of the chosen frameworks. Instead of heavy state-management libraries or over-engineered abstractions, it relies on modern React patterns and .NET Minimal API's lean architecture. This keeps the bundle size small and the codebase easy to audit.
+The app focuses on using the built-in capabilities of the chosen frameworks. Instead of heavy state-management libraries or over-engineered abstractions, it relies on modern React patterns and .NET's controller-based architecture with clean domain separation. This keeps the bundle size small and the codebase easy to audit.
 
 ### 2. Accessibility (A11y) & Inclusivity
 - **Keyboard Navigation:** Fully navigable via keyboard. Interactive elements like cabana tiles and modal dialogs are wired to capture focus seamlessly, ensuring power users and accessible devices can comfortably traverse the app without a mouse.

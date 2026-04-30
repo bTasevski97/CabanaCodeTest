@@ -12,7 +12,7 @@ const baseTile: Tile = {
   cabanaId: "W-3-5",
 };
 
-function renderCabanaTile(status: CabanaStatus, onClick = vi.fn()) {
+function renderCabanaTile(status: CabanaStatus | undefined, onClick = vi.fn()) {
   render(<CabanaTile tile={baseTile} status={status} onClick={onClick} />);
   return { onClick };
 }
@@ -44,6 +44,21 @@ describe("CabanaTile", () => {
   it("does not call onClick when a booked cabana is clicked", async () => {
     const user = userEvent.setup();
     const { onClick } = renderCabanaTile("booked");
+
+    await user.click(screen.getByRole("button", { name: /cabana W-3-5/i }));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("renders a cabana with unknown status when status is undefined", () => {
+    renderCabanaTile(undefined);
+
+    const button = screen.getByRole("button", { name: /cabana W-3-5.*status unknown/i });
+    expect(button).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("does not call onClick when an unknown-status cabana is clicked", async () => {
+    const user = userEvent.setup();
+    const { onClick } = renderCabanaTile(undefined);
 
     await user.click(screen.getByRole("button", { name: /cabana W-3-5/i }));
     expect(onClick).not.toHaveBeenCalled();

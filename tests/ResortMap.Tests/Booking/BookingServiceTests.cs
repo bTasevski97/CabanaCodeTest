@@ -1,39 +1,37 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using NSubstitute;
 using ResortMap.Booking;
 using ResortMap.Guests;
-using ResortMap.Map;
+using ResortMap.Maps;
 using Xunit;
+
+using MapModel = ResortMap.Maps.Map;
 
 namespace ResortMap.Tests.Booking;
 
 public class BookingServiceTests
 {
-    private static MapResponse CreateMapWithCabanas(params (int row, int col)[] positions)
+    private static MapModel CreateMapWithCabanas(params (int row, int col)[] positions)
     {
-        var map = new MapResponse
-        {
-            Rows = 5,
-            Cols = 5,
-            Tiles = []
-        };
+        if (positions.Length == 0)
+            return MapModel.Parse(["."]);
 
-        foreach (var (row, col) in positions)
+        int rows = positions.Max(p => p.row) + 1;
+        int cols = positions.Max(p => p.col) + 1;
+        var lines = new string[rows];
+
+        for (int r = 0; r < rows; r++)
         {
-            map.Tiles.Add(new Tile
-            {
-                Type = TileType.Cabana,
-                Row = row,
-                Col = col,
-                CabanaId = $"W-{row}-{col}"
-            });
+            var chars = new char[cols];
+            Array.Fill(chars, '.');
+            foreach (var pos in positions.Where(p => p.row == r))
+                chars[pos.col] = 'W';
+            lines[r] = new string(chars);
         }
 
-        return map;
+        return MapModel.Parse(lines);
     }
 
-    private static BookingService CreateService(MapResponse map, IGuestValidator? validator = null)
+    private static BookingService CreateService(MapModel map, IGuestValidator? validator = null)
     {
         validator ??= Substitute.For<IGuestValidator>();
         validator.IsValid(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
@@ -56,17 +54,8 @@ public class BookingServiceTests
     [Fact]
     public void GetAllCabanas_ExcludesNonCabanaTiles()
     {
-        var map = new MapResponse
-        {
-            Rows = 1,
-            Cols = 3,
-            Tiles =
-            [
-                new Tile { Type = TileType.Path, Row = 0, Col = 0 },
-                new Tile { Type = TileType.Cabana, Row = 0, Col = 1, CabanaId = "W-0-1" },
-                new Tile { Type = TileType.Pool, Row = 0, Col = 2 },
-            ]
-        };
+        // '#' = Path, 'W' = Cabana, 'p' = Pool
+        var map = MapModel.Parse(["#Wp"]);
         var service = CreateService(map);
 
         var cabanas = service.GetAllCabanas().ToList();
@@ -85,33 +74,32 @@ public class BookingServiceTests
     }
 
     [Fact]
-    public void BookCabana_ValidRequest_ReturnsOkWithSuccessMessage()
+    public void BookCabana_ValidRequest_ReturnsSuccessWithMessage()
     {
         var map = CreateMapWithCabanas((0, 0));
         var service = CreateService(map);
 
         var result = service.BookCabana("W-0-0", new BookingRequest("101", "Alice Smith"));
 
-        var ok = Assert.IsType<Ok<BookingResponse>>(result);
-        Assert.True(ok.Value!.Success);
-        Assert.Contains("Alice Smith", ok.Value.Message);
-        Assert.Contains("101", ok.Value.Message);
+        Assert.True(result.Success);
+        Assert.Contains("Alice Smith", result.Message);
+        Assert.Contains("101", result.Message);
     }
 
     [Fact]
-    public void BookCabana_NonExistentId_ReturnsNotFound()
+    public void BookCabana_NonExistentId_ReturnsNotFoundError()
     {
         var map = CreateMapWithCabanas((0, 0));
         var service = CreateService(map);
 
         var result = service.BookCabana("W-99-99", new BookingRequest("101", "Alice"));
 
-        var notFound = Assert.IsType<NotFound<BookingResponse>>(result);
-        Assert.False(notFound.Value!.Success);
+        Assert.False(result.Success);
+        Assert.Equal(BookingError.NotFound, result.Error);
     }
 
     [Fact]
-    public void BookCabana_AlreadyBooked_ReturnsConflict()
+    public void BookCabana_AlreadyBooked_ReturnsAlreadyBookedError()
     {
         var map = CreateMapWithCabanas((0, 0));
         var service = CreateService(map);
@@ -119,13 +107,13 @@ public class BookingServiceTests
         service.BookCabana("W-0-0", new BookingRequest("101", "Alice"));
         var result = service.BookCabana("W-0-0", new BookingRequest("102", "Bob"));
 
-        var conflict = Assert.IsType<Conflict<BookingResponse>>(result);
-        Assert.False(conflict.Value!.Success);
-        Assert.Contains("already booked", conflict.Value.Message);
+        Assert.False(result.Success);
+        Assert.Equal(BookingError.AlreadyBooked, result.Error);
+        Assert.Contains("already booked", result.Message);
     }
 
     [Fact]
-    public void BookCabana_InvalidGuest_ReturnsBadRequest()
+    public void BookCabana_InvalidGuest_ReturnsInvalidGuestError()
     {
         var map = CreateMapWithCabanas((0, 0));
         var validator = Substitute.For<IGuestValidator>();
@@ -134,12 +122,12 @@ public class BookingServiceTests
 
         var result = service.BookCabana("W-0-0", new BookingRequest("999", "Fake Person"));
 
-        var badRequest = Assert.IsType<BadRequest<BookingResponse>>(result);
-        Assert.False(badRequest.Value!.Success);
+        Assert.False(result.Success);
+        Assert.Equal(BookingError.InvalidGuest, result.Error);
     }
 
     [Fact]
-    public void BookCabana_ValidRequest_UpdatesCabanaState()
+    public void BookCabana_ValidRequest_UpdatesCabanaStatusToBooked()
     {
         var map = CreateMapWithCabanas((0, 0));
         var service = CreateService(map);
@@ -148,9 +136,6 @@ public class BookingServiceTests
 
         var cabana = service.GetAllCabanas().Single();
         Assert.Equal(CabanaStatus.Booked, cabana.Status);
-        Assert.NotNull(cabana.BookedBy);
-        Assert.Equal("101", cabana.BookedBy.Room);
-        Assert.Equal("Alice Smith", cabana.BookedBy.GuestName);
     }
 
     [Fact]

@@ -25,7 +25,7 @@ export const handlers = [
     return HttpResponse.json(mockCabanas);
   }),
 
-  http.post("/api/cabanas/:id/book", async ({ params, request }) => {
+  http.post("/api/cabanas/:id/bookings", async ({ params, request }) => {
     const { id } = params;
     const body = (await request.json()) as { room: string; guestName: string };
 

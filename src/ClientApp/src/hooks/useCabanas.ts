@@ -52,7 +52,7 @@ export function useBookCabana(onBookingSuccess: () => void) {
     setIsBooking(true);
     setBookingError(null);
     try {
-      const response = await fetch(`/api/cabanas/${cabanaId}/book`, {
+      const response = await fetch(`/api/cabanas/${cabanaId}/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),

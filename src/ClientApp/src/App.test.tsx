@@ -66,7 +66,7 @@ describe("Booking Flow Integration", () => {
 
   it("shows an error message when booking fails with server error (500)", async () => {
     server.use(
-      http.post("/api/cabanas/:id/book", () => {
+      http.post("/api/cabanas/:id/bookings", () => {
         return new HttpResponse(null, { status: 500 });
       })
     );

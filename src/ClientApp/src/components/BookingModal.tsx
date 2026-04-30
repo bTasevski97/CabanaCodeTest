@@ -38,12 +38,14 @@ export function BookingModal({ cabana, onClose, onBookingSuccess }: BookingModal
     >
       {bookingResult ? (
         <BookingSuccessView result={bookingResult} onClose={onClose} />
-      ) : cabana.status === "booked" ? (
+      ) : cabana.status !== "available" ? (
         <>
           <ModalHeader id="dialog-title" title="Cabana Unavailable" onClose={onClose} locked={false} />
           <div className="p-6">
             <p className="py-4 text-center text-sm text-(--color-text-muted)">
-              This cabana is already booked.
+              {cabana.status === "booked"
+                ? "This cabana is already booked."
+                : "This cabana's status is unknown and cannot be booked at this time. Please try again later or contact reception."}
             </p>
           </div>
         </>

@@ -8,12 +8,9 @@ public class GuestValidatorTests
 {
     private GuestValidator CreateValidatorWithGuests(params Guest[] guests)
     {
-        var validator = new GuestValidator();
         var tempFile = Path.GetTempFileName();
         File.WriteAllText(tempFile, JsonSerializer.Serialize(guests));
-        validator.Load(tempFile);
-        File.Delete(tempFile);
-        return validator;
+        return new GuestValidator(tempFile);
     }
 
     [Fact]

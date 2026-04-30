@@ -9,19 +9,21 @@ public interface IGuestValidator
     bool IsValid(string room, string guestName);
 }
 
-public class GuestValidator : IGuestValidator
+public class GuestValidator(string filePath) : IGuestValidator
 {
-    private readonly HashSet<Guest> _guests = new();
+    private readonly HashSet<Guest> _guests = LoadGuests(filePath);
 
-    public void Load(string filePath)
+    private static HashSet<Guest> LoadGuests(string path)
     {
-        var json = File.ReadAllText(filePath);
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException($"Critical configuration missing: Guest bookings file '{path}' not found.");
+        }
+
+        var json = File.ReadAllText(path);
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        _guests.UnionWith(JsonSerializer.Deserialize<List<Guest>>(json, options) ?? []);
+        return JsonSerializer.Deserialize<HashSet<Guest>>(json, options) ?? new HashSet<Guest>();
     }
 
-    public bool IsValid(string room, string guestName)
-    {
-        return _guests.Contains(new Guest(room, guestName));
-    }
+    public bool IsValid(string room, string guestName) => _guests.Contains(new Guest(room, guestName));
 }

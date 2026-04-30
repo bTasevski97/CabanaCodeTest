@@ -42,6 +42,17 @@ export default function App() {
           </li>
           <li aria-hidden="true" className="hidden h-4 w-px bg-(--color-border) lg:block" />
           <li className="flex items-center gap-2 text-sm font-medium text-(--color-text)">
+            <span
+              className="relative flex size-6 items-center justify-center overflow-hidden border-2 border-dashed border-(--color-unknown) opacity-35"
+              style={{ backgroundImage: "url(/assets/parchmentBasic.png)", backgroundSize: "cover" }}
+            >
+              <img src="/assets/cabana.png" alt="" className="size-full object-contain" />
+              <div className="absolute inset-0 bg-(--color-unknown)/15" />
+            </span>
+            Cabana (Unknown)
+          </li>
+          <li aria-hidden="true" className="hidden h-4 w-px bg-(--color-border) lg:block" />
+          <li className="flex items-center gap-2 text-sm font-medium text-(--color-text)">
             <img src="/assets/pool.png" alt="" className="size-5 object-contain" />
             Pool
           </li>

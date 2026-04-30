@@ -1,13 +1,13 @@
-namespace ResortMap.Map;
+namespace ResortMap.Maps;
 
 public static class PathTileResolver
 {
-    public static (PathVariant Variant, int Rotation) Resolve(string[] map, int row, int col)
+    public static (PathVariant Variant, int Rotation) Resolve(Tile[,] grid, int row, int col)
     {
-        bool hasTop    = IsPath(map, row - 1, col);
-        bool hasBottom = IsPath(map, row + 1, col);
-        bool hasLeft   = IsPath(map, row, col - 1);
-        bool hasRight  = IsPath(map, row, col + 1);
+        bool hasTop    = IsPath(grid, row - 1, col);
+        bool hasBottom = IsPath(grid, row + 1, col);
+        bool hasLeft   = IsPath(grid, row, col - 1);
+        bool hasRight  = IsPath(grid, row, col + 1);
 
         int connections = (hasTop ? 1 : 0) + (hasBottom ? 1 : 0) + (hasLeft ? 1 : 0) + (hasRight ? 1 : 0);
 
@@ -53,10 +53,10 @@ public static class PathTileResolver
         return (PathVariant.Straight, 0);
     }
 
-    private static bool IsPath(string[] map, int row, int col)
+    private static bool IsPath(Tile[,] grid, int row, int col)
     {
-        if (row < 0 || row >= map.Length) return false;
-        if (col < 0 || col >= map[row].Length) return false;
-        return map[row][col] == '#';
+        if (row < 0 || row >= grid.GetLength(0)) return false;
+        if (col < 0 || col >= grid.GetLength(1)) return false;
+        return grid[row, col].Type == TileType.Path;
     }
 }

@@ -30,6 +30,7 @@ export function ResortMap({ cabanas, cabanasLoading, cabanasError, onCabanaSelec
   }
 
   const cabanaMap = new Map(cabanas.map((cabana) => [cabana.id, cabana]));
+
   const available = cabanas.filter((c) => c.status === "available").length;
   const fullyBooked = cabanas.length > 0 && available === 0;
 
@@ -68,8 +69,8 @@ export function ResortMap({ cabanas, cabanasLoading, cabanasError, onCabanaSelec
               <CabanaTile
                 key={`${tile.row}-${tile.col}`}
                 tile={tile}
-                status={cabana?.status ?? "available"}
-                onClick={() => cabana && onCabanaSelect(cabana)}
+                status={cabana?.status}
+                onClick={() => cabana && cabana.status === "available" && onCabanaSelect(cabana)}
               />
             );
           }
