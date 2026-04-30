@@ -46,6 +46,6 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       message: `Cabana booked for ${body.guestName} (Room ${body.room}).`,
-    });
+    }, { status: 201 });
   }),
 ];
